@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Web Browser</string>
+    <string name="url_edittext_hint">Type a URL</string>
+    <string name="go_button_label">GO</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="menu_back_label">Previous Tab</string>
+    <string name="menu_next_label">Next Tab</string>
+    <string name="menu_add_label">New Tab</string>
+</resources>
