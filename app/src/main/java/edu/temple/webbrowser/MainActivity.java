@@ -143,10 +143,6 @@ public class MainActivity extends AppCompatActivity {
                 mPager.setCurrentItem(currentIndex);
                 message = String.format("Tab %d of %d", currentIndex+1, mPager.getAdapter().getCount());
                 Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-                Intent test = new Intent();
-                test.setAction(Intent.ACTION_VIEW);
-                test.setData(Uri.parse("https://www.temple.edu"));
-                startActivity(test);
                 return true;
 
             case R.id.action_next:
