@@ -1,10 +1,13 @@
 package edu.temple.webbrowser;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,6 +17,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
@@ -30,31 +35,30 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         setOnClickListeners();
 
         Toolbar myToolbar = findViewById(R.id.my_toolbar);
         myToolbar.inflateMenu(R.menu.menu);
         setSupportActionBar(myToolbar);
 
-        mUrlEntry = findViewById(R.id.url_edittext);
-        mUrlEntry.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View view, int i, KeyEvent keyEvent) {
-                if (keyEvent.getAction() == KeyEvent.ACTION_DOWN && keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER)
-                {
-                    mGoButton.callOnClick();
-                }
-                return false;
-            }
-        });
-        WebPageFragment temp = new WebPageFragment();
-        FragmentList.FRAGMENTS.add(temp);
-
         mAdapter = new CustomPagerAdapter(getSupportFragmentManager());
         mPager = findViewById(R.id.viewPager);
         mPager.addOnPageChangeListener(new CustomListener());
         mPager.setAdapter(mAdapter);
+
+        Intent intent = getIntent();
+        if (TextUtils.equals(intent.getAction(), (Intent.ACTION_VIEW))) {
+            WebPageFragment frag = new WebPageFragment();
+
+            String url = getIntent().getData().toString();
+            Bundle args = new Bundle();
+            args.putString(FragmentList.WEB_VIEW_URL, url);
+            frag.setArguments(args);
+            FragmentList.FRAGMENTS.add(frag);
+            mPager.getAdapter().notifyDataSetChanged();
+            mPager.setCurrentItem(mPager.getAdapter().getCount());
+            mUrlEntry.setText(url);
+        }
     }
 
     @Override
@@ -113,6 +117,18 @@ public class MainActivity extends AppCompatActivity {
                 mUrlEntry.setText("");
             }
         });
+
+        mUrlEntry = findViewById(R.id.url_edittext);
+        mUrlEntry.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View view, int i, KeyEvent keyEvent) {
+                if (keyEvent.getAction() == KeyEvent.ACTION_DOWN && keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER)
+                {
+                    mGoButton.callOnClick();
+                }
+                return false;
+            }
+        });
     }
 
     @Override
@@ -127,6 +143,10 @@ public class MainActivity extends AppCompatActivity {
                 mPager.setCurrentItem(currentIndex);
                 message = String.format("Tab %d of %d", currentIndex+1, mPager.getAdapter().getCount());
                 Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+                Intent test = new Intent();
+                test.setAction(Intent.ACTION_VIEW);
+                test.setData(Uri.parse("https://www.temple.edu"));
+                startActivity(test);
                 return true;
 
             case R.id.action_next:
@@ -164,7 +184,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onPageSelected(int i) {
-            mUrlEntry.setText(FragmentList.FRAGMENTS.get(i).mWebView.getUrl());
+            mUrlEntry.setText(FragmentList.FRAGMENTS.get(i).mURL);
         }
 
         @Override

@@ -3,6 +3,7 @@ package edu.temple.webbrowser;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
@@ -25,6 +26,20 @@ public class WebPageFragment extends Fragment {
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        Bundle args = getArguments();
+        if (savedInstanceState != null) {
+            mURL = savedInstanceState.get("URL").toString();
+        } else if (args != null) {
+            mURL = args.get(FragmentList.WEB_VIEW_URL).toString();
+        } else {
+            mURL = "http://www.google.com";
+        }
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
@@ -33,12 +48,8 @@ public class WebPageFragment extends Fragment {
         mWebView = view.findViewById(R.id.webView);
         mWebView.setWebViewClient(new WebViewClient());
         mWebView.getSettings().setJavaScriptEnabled(true);
+        mWebView.loadUrl(mURL);
 
-        if (savedInstanceState == null) {
-            mWebView.loadUrl("http://www.google.com");
-        } else {
-            mWebView.loadUrl(savedInstanceState.get("URL").toString());
-        }
         return view;
     }
 
@@ -52,4 +63,5 @@ public class WebPageFragment extends Fragment {
         super.onSaveInstanceState(outState);
         outState.putString("URL", mWebView.getUrl());
     }
+
 }
